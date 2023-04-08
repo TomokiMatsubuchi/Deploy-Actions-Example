@@ -3,7 +3,7 @@ name: Deployment
 on:
   workflow_dispatch:
     inputs:
-      selected_environment:
+      selected_environment: #他にはenvironmentを使用することもできる。
         description: 'デプロイ環境を選択してください。'
         required: true
         default: '---'
@@ -19,25 +19,38 @@ env:
 jobs:
   pre_deploy:
     runs-on: ubuntu-latest
-    outputs:
+    outputs: #環境毎に設定したい値は基本的にここで設定する。
       WORKING_BRANCH: ${{ env.WORKING_BRANCH }} #deployジョブ内でcheckoutする時に使用する
+      TOKEN_NAME: ${{ env.TOKEN_NAME }}
     steps:
       - name: Setting development environment
         if: env.SELECTED_ENVIRONMENT == 'development'
         run: |
           echo 'WORKING_BRANCH=develop' >> $GITHUB_ENV
+          echo 'TOKEN_NAME=DEVELOP' >> $GITHUB_ENV
       - name: Setting staging environment
         if: env.SELECTED_ENVIRONMENT == 'stage'
         run: |
           echo 'WORKING_BRANCH=stage' >> $GITHUB_ENV
+          echo 'TOKEN_NAME=STAGE' >> $GITHUB_ENV
       - name: Setting production environment
         if: env.SELECTED_ENVIRONMENT == 'production'
         run: |
-          echo 'WORKING_BRANCH=production' >> $GITHUB_ENV
+          echo 'WORKING_BRANCH=master' >> $GITHUB_ENV
+          echo 'TOKEN_NAME=PRODUCTION' >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
     needs: pre_deploy
     steps:
-      - name: Confirm working branch
-        run: echo ${{ needs.pre_deploy.outputs.WORKING_BRANCH }}
+      - name: Confirm TOKEN_NAME
+        run: echo ${{ env[format('DEPLOY_{0}', needs.pre_deploy.outputs.TOKEN_NAME)] }}
+        env:
+          DEPLOY_DEVELOP: 'development'
+          DEPLOY_STAGE: 'stage'
+          DEPLOY_PRODUCTION: 'production'
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.pre_deploy.outputs.WORKING_BRANCH }}
+      #ブランチのcheckoutが出来たので、いかにデプロイ処理を記述していく。
