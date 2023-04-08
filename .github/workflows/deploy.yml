@@ -3,7 +3,7 @@ name: Deployment
 on:
   workflow_dispatch:
     inputs:
-      selected environment:
+      selected_environment:
         description: 'デプロイ環境を選択してください。'
         required: true
         default: '---'
@@ -14,7 +14,7 @@ on:
           - production
 
 env:
-  SELECTED_ENVIRONMENT: ${{ github.event.inputs.environment }}
+  SELECTED_ENVIRONMENT: ${{ github.event.inputs.selected_environment }}
 
 jobs:
   pre_deploy:
