@@ -18,7 +18,7 @@ env:
 
 jobs:
   pre_deploy:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     outputs:
       WORKING_BRANCH: ${{ env.WORKING_BRANCH }} #deployジョブ内でcheckoutする時に使用する
     steps:
@@ -36,7 +36,7 @@ jobs:
           echo 'WORKING_BRANCH=production' >> $GITHUB
 
   deploy:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     needs: pre_deploy
     steps:
       - name: Confirm working branch
