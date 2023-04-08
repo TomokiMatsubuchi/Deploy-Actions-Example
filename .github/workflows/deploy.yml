@@ -9,7 +9,7 @@ on:
         default: '---'
         type: choice
         options:
-          - develop
+          - development
           - stage
           - production
 
@@ -33,9 +33,7 @@ jobs:
       - name: Setting production environment
         if: env.SELECTED_ENVIRONMENT == 'production'
         run: |
-          echo 'WORKING_BRANCH=production' >> $GITHUB
-      - name: confirming environment
-        run: echo ${{ env.SELECTED_ENVIRONMENT }}
+          echo 'WORKING_BRANCH=production' >> $GITHUB_ENV
 
   deploy:
     runs-on: ubuntu-latest
