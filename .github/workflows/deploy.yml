@@ -1,0 +1,43 @@
+name: Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      selected environment:
+        description: 'デプロイ環境を選択してください。'
+        required: true
+        default: '---'
+        type: choice
+        options:
+          - develop
+          - stage
+          - production
+
+env:
+  SELECTED_ENVIRONMENT: ${{ github.event.inputs.environment }}
+
+jobs:
+  pre_deploy:
+    runs_on: ubuntu-latest
+    outputs:
+      WORKING_BRANCH: ${{ env.WORKING_BRANCH }} #deployジョブ内でcheckoutする時に使用する
+    steps:
+      - name: Setting development environment
+        if: env.SELECTED_ENVIRONMENT == 'development'
+        run: |
+          echo 'WORKING_BRANCH=develop' >> $GITHUB_ENV
+      - name: Setting staging environment
+        if: env.SELECTED_ENVIRONMENT == 'stage'
+        run: |
+          echo 'WORKING_BRANCH=stage' >> $GITHUB_ENV
+      - name: Setting production environment
+        if: env.SELECTED_ENVIRONMENT == 'production'
+        run: |
+          echo 'WORKING_BRANCH=production' >> $GITHUB
+
+  deploy:
+    runs_on: ubuntu-latest
+    needs: pre_deploy
+    steps:
+      - name: Confirm working branch
+        run: echo ${{ needs.pre_deploy.outputs.WORKING_BRANCH }}
