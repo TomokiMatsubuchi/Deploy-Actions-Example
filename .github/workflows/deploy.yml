@@ -34,6 +34,7 @@ jobs:
         if: env.SELECTED_ENVIRONMENT == 'production'
         run: |
           echo 'WORKING_BRANCH=production' >> $GITHUB
+        run: echo ${{ env.SELECTED_ENVIRONMENT }}
 
   deploy:
     runs-on: ubuntu-latest
